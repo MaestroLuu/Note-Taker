@@ -27,26 +27,16 @@ app.post("/api/notes", (req, res) => {
     const { title, text, id} = req.body;
     
     if( title&&text) {
-        // const notesArray = JSON.parse(db);
         const newNote = {title, text, id: uniqid()};
-        
         db.push(newNote);
         
-        // const reviewNotes = JSON.parse(db);
-        
-        fs.writeFile(`./db/db.json`, db, (err) =>
+        fs.writeFile(`./db/db.json`, JSON.stringify(db), (err) =>
             err ?
             console.error(err) 
             :console.log(`Review for ${newNote.title} has been written to JSON file`)
         ); 
 
-        const response = {
-            status: 'success',
-            body: newNote,
-        };
-  
-        console.log(response);
-        res.status(201).json(response);
+        res.status(200).send('Post complete');
     } else {
         res.status(500).json('Error in posting notes');
     }
