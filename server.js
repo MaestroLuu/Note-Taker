@@ -21,14 +21,22 @@ app.get("/notes", (req, res) =>
 
 app.delete("/api/notes/:id", (req, res) => {
     const { id } = req.params;
+
     // determines if specified id of note exists
     const deletedNote = db.find(note => note.id === id);
+
     // IF note exists, filter it out and create new db array 
     if(deletedNote) {
         console.log(deletedNote);
         db = db.filter(note => note.id !== id);
-        console.log(db);
-    res.status(200).json('test')
+
+        fs.writeFile(`./db/db.json`, JSON.stringify(db), (err) =>
+        err ?
+        console.error(err) 
+        :console.log('Note has been successfully deleted.')
+        ); 
+        
+        res.status(200).json(db)
     } else {
         console.log(deletedNote);
         res.status(404).json('Your note does not appear to exist.')
@@ -41,7 +49,7 @@ app.get("*", (req, res) =>
 
 app.post("/api/notes", (req, res) => {
     const { title, text, id} = req.body;
-    if( title&&text) {
+    if(title&&text) {
         const newNote = {title, text, id: uniqid()};
         db.push(newNote);
         
@@ -53,10 +61,10 @@ app.post("/api/notes", (req, res) => {
 
         res.status(200).json(db);
     } else {
-        res.status(500).json('Error in posting notes');
+        res.status(404).json('Error in posting notes');
     }
 });
 
 app.listen(PORT, () =>
-    console.log(`App listening at http://localhost:${PORT} 🚀`)
+    console.log(`http://localhost:${PORT}`)
 );
