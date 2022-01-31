@@ -23,13 +23,16 @@ app.delete("/api/notes/:id", (req, res) => {
     const { id } = req.params;
     // determines if specified id of note exists
     const deletedNote = db.find(note => note.id === id);
-    // if note exists, filter it out and create new db array 
+    // IF note exists, filter it out and create new db array 
     if(deletedNote) {
-        db = db.filter(note => note.id ==! id);
+        console.log(deletedNote);
+        db = db.filter(note => note.id !== id);
+        console.log(db);
+    res.status(200).json('test')
     } else {
+        console.log(deletedNote);
         res.status(404).json('Your note does not appear to exist.')
     }                                  
-    return res.send();
 });
 
 app.get("*", (req, res) =>
