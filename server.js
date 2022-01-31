@@ -20,16 +20,16 @@ app.get("/notes", (req, res) =>
 );
 
 app.delete("/api/notes/:id", (req, res) => {
-        const { id } = req.params;
-        const noteID = db.find(note => note.id === id);
-    
-        if (noteID) {
-            db.splice(req.params, 1).join('');
-            res.status(201).json('Revision complete');
-        } else {
-            res.status(500).json('Error in posting notes');
-        }
-        return res.send();
+    const { id } = req.params;
+    // determines if specified id of note exists
+    const deletedNote = db.find(note => note.id === id);
+    // if note exists, filter it out and create new db array 
+    if(deletedNote) {
+        db = db.filter(note => note.id ==! id);
+    } else {
+        res.status(404).json('Your note does not appear to exist.')
+    }                                  
+    return res.send();
 });
 
 app.get("*", (req, res) =>
@@ -48,7 +48,7 @@ app.post("/api/notes", (req, res) => {
             :console.log(`Review for ${newNote.title} has been written to JSON file`)
         ); 
 
-        res.status(201).json('Post complete');
+        res.status(200).json(db);
     } else {
         res.status(500).json('Error in posting notes');
     }
