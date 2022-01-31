@@ -1,7 +1,7 @@
 const fs = require("fs");
 const express = require("express");
 const path = require("path");
-const db = require("./db/db.json");
+let db = require("./db/db.json");
 const uniqid = require("uniqid");
 
 const PORT = process.env.PORT || 3001;
@@ -19,13 +19,25 @@ app.get("/notes", (req, res) =>
     res.sendFile(path.join(__dirname, "/public/notes.html"))
 );
 
+app.delete("/api/notes/:id", (req, res) => {
+        const { id } = req.params;
+        const noteID = db.find(note => note.id === id);
+    
+        if (noteID) {
+            db.splice(req.params, 1).join('');
+            res.status(201).json('Revision complete');
+        } else {
+            res.status(500).json('Error in posting notes');
+        }
+        return res.send();
+});
+
 app.get("*", (req, res) =>
     res.sendFile(path.join(__dirname, "/public/index.html"))
 );
 
 app.post("/api/notes", (req, res) => {
     const { title, text, id} = req.body;
-    
     if( title&&text) {
         const newNote = {title, text, id: uniqid()};
         db.push(newNote);
@@ -36,7 +48,7 @@ app.post("/api/notes", (req, res) => {
             :console.log(`Review for ${newNote.title} has been written to JSON file`)
         ); 
 
-        res.status(200).send('Post complete');
+        res.status(201).json('Post complete');
     } else {
         res.status(500).json('Error in posting notes');
     }
